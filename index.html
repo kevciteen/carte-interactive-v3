@@ -1605,33 +1605,23 @@ document.getElementById("sendToMondayBtn").addEventListener("click", async () =>
 
     const c = p.copro[0] || {};
 
+    console.log("Copro RAW:", c);
+
     const nom = c["nom_d_usage_de_la_copropriete"] || "Non renseigné";
-    const adresse =
-        c["adresse_de_reference"] ||
-        `${c["numero_et_voie_adresse_de_reference"] || ""} ${c["adresse_complementaire_1"] || ""}`.trim();
 
-    const cp =
-        c["code_postal_adresse_de_reference"] ||
-        c["code_postal"] ||
-        "";
+    const adresse = [
+        c["numero_et_voie_adresse_de_reference"] || "",
+        c["adresse_complementaire_1"] || "",
+        c["adresse_de_reference"] || ""
+    ].join(" ").replace(/\s\s+/g, " ").trim();
 
-    const ville =
-        c["commune_adresse_de_reference"] ||
-        c["commune"] ||
-        "";
+    const cp = c["code_postal_adresse_de_reference"] || "";
+    const ville = c["commune_adresse_de_reference"] || "";
+    const syndic = c["raison_sociale_du_representant_legal"] || "";
+    const lots = c["nombre_total_de_lots"] || "";
+    const periode = c["periode_de_construction"] || "";
 
-    const syndic =
-        c["raison_sociale_du_representant_legal"] ||
-        "Non renseigné";
-
-    const lots =
-        c["nombre_total_de_lots"] ||
-        "";
-
-    const periode =
-        c["periode_de_construction"] ||
-        "Non renseignée";
-
+    // DPE récupéré en cache
     const dpeKey = `${p.lat.toFixed(6)}|${p.lon.toFixed(6)}`;
     const dpe = dpeCache.get(dpeKey);
     const classeDPE = dpe?.classe_consommation_energie || "NR";
