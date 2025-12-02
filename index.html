@@ -21,155 +21,7 @@
     /* ==========================
        ÉCRAN D’OUVERTURE
     =========================== */
-    .opening-screen {
-      position: fixed;
-      z-index: 20000;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: linear-gradient(
-        135deg,
-        #ffffff 0%,
-        #f5faf7 35%,
-        #d9f5e5 65%,
-        #16a34a 100%
-      );
-      color: #0f172a;
-    }
-
-    .opening-inner {
-      max-width: 640px;
-      width: 100%;
-      background: #ffffffee;
-      border-radius: 18px;
-      padding: 24px 24px 20px;
-      box-shadow: 0 18px 40px rgba(15,23,42,0.18);
-      border: 1px solid rgba(22,163,74,0.25);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .opening-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .opening-logo-wrap {
-      flex-shrink: 0;
-      width: 48px;
-      height: 48px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 20%, #bbf7d0 0, #16a34a 45%, #0d9488 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .opening-logo {
-      max-width: 70%;
-      max-height: 70%;
-      display: block;
-    }
-
-    .opening-title-block {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .opening-title {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: #065f46;
-    }
-
-    .opening-subtitle {
-      font-size: 12px;
-      color: #4b5563;
-    }
-
-    .opening-body {
-      font-size: 14px;
-      color: #374151;
-      line-height: 1.5;
-    }
-
-    .opening-body strong {
-      color: #047857;
-      font-weight: 600;
-    }
-
-    .opening-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-top: 4px;
-      font-size: 11px;
-      color: #4b5563;
-    }
-
-    .opening-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .badge-env {
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(22,163,74,0.4);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #065f46;
-      background: #ecfdf5;
-    }
-
-    .opening-button {
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: none;
-      background: #22c55e;
-      color: #064e3b;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 8px 25px rgba(34,197,94,0.4);
-      transition: transform 0.08s ease-out, box-shadow 0.12s ease-out, background 0.12s;
-    }
-
-    .opening-button:hover {
-      background: #16a34a;
-      box-shadow: 0 10px 30px rgba(34,197,94,0.55);
-      transform: translateY(-1px);
-    }
-
-    .opening-button:active {
-      transform: translateY(1px);
-      box-shadow: 0 4px 12px rgba(34,197,94,0.4);
-    }
-
-    .opening-hint {
-      font-size: 11px;
-      color: #6b7280;
-    }
-
-    .opening-screen.hidden {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease-out;
-    }
+    
 
 /* ==========================
        BARRE DE RECHERCHE
@@ -348,10 +200,6 @@
   display: none;
 }
 
-.leaflet-control-layers {
-  font-size: 12px;
-}
-
 
     /* ==========================
        TOGGLE FOND OSM / SAT
@@ -516,6 +364,534 @@
       background: #eef2ff;
       color: #3730a3;
     }
+
+    /* ==========================
+   SEARCH UI (GoRénove-like)
+========================== */
+.search-shell{
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none; /* on rend cliquable seulement la card */
+  z-index: 15000;
+  padding: 22px;
+}
+
+.search-card{
+  pointer-events: auto;
+  width: min(860px, 92vw);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(15,23,42,0.10);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(15,23,42,0.18);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  color: #0f172a;
+}
+
+.search-top{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(15,23,42,0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.88));
+}
+
+.search-branding{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-logo{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: rgba(22,163,74,0.08);
+  border: 1px solid rgba(22,163,74,0.18);
+  padding: 6px;
+}
+
+.brand-text{ min-width:0; }
+.brand-name{
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+.brand-tagline{
+  font-size: 12px;
+  color: rgba(15,23,42,0.62);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-main{
+  padding: 16px 18px 10px;
+}
+
+.input-wrap{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 18px;
+  border: 1px solid rgba(15,23,42,0.10);
+  background: rgba(15,23,42,0.03);
+}
+
+.input-ico{ font-size: 14px; opacity: 0.75; }
+.input{
+  width: 100%;
+  border: 1px solid rgba(15,23,42,0.12);
+  background: rgba(255,255,255,0.96);
+  color: #0f172a;
+  border-radius: 14px;
+  padding: 12px 12px;
+  outline: none;
+}
+.input:focus{
+  border-color: rgba(14,165,233,0.55);
+  box-shadow: 0 0 0 4px rgba(14,165,233,0.16);
+}
+
+.btn-primary{
+  flex: 0 0 auto;
+  border: 1px solid rgba(22,163,74,0.35);
+  background: linear-gradient(180deg, rgba(34,197,94,0.96), rgba(22,163,74,0.96));
+  color: #053a2b;
+  border-radius: 999px;
+  padding: 12px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 14px 24px rgba(22,163,74,0.18);
+}
+.btn-primary:hover{ transform: translateY(-1px); }
+
+.filters{
+  padding: 6px 18px 16px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 12px;
+}
+.field{ display:flex; flex-direction: column; gap: 6px; }
+.field.span2{ grid-column: 1 / -1; }
+
+.label{
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(15,23,42,0.65);
+}
+
+.row{ display:flex; gap: 10px; }
+
+.actions{
+  display:flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.btn-ghost{
+  border: 1px solid rgba(15,23,42,0.12);
+  background: rgba(255,255,255,0.92);
+  color: #0f172a;
+  border-radius: 999px;
+  padding: 10px 12px;
+  cursor:pointer;
+}
+.btn-ghost:hover{ background: rgba(15,23,42,0.04); }
+
+.btn-success{
+  border: 1px solid rgba(5,150,105,0.28);
+  background: linear-gradient(180deg, rgba(34,197,94,0.95), rgba(5,150,105,0.95));
+  color: #053a2b;
+  border-radius: 999px;
+  padding: 10px 12px;
+  font-weight: 800;
+  cursor:pointer;
+}
+
+.status{
+  padding: 12px 18px 16px;
+  font-size: 12px;
+  color: rgba(15,23,42,0.68);
+  white-space: pre-line;
+}
+
+/* Bouton "Filtres" (utile en mode mini sur la carte) */
+.chip-btn{
+  display:none; /* visible seulement sur la carte */
+  align-items:center;
+  gap: 8px;
+  border: 1px solid rgba(15,23,42,0.12);
+  background: rgba(255,255,255,0.92);
+  border-radius: 999px;
+  padding: 10px 12px;
+  cursor:pointer;
+  font-weight: 800;
+}
+.chev{ opacity: 0.7; }
+
+/* ========== MODE CARTE (mini panneau flottant) ========== */
+.search-shell.on-map{
+  position: absolute;
+  inset: auto;
+  top: 16px;
+  left: 16px;
+  width: auto;
+  height: auto;
+  display: block;
+  padding: 0;
+  pointer-events: none;
+}
+.search-shell.on-map .search-card{
+  pointer-events: auto;
+  width: 380px;
+  border-radius: 18px;
+}
+
+/* en mode carte, on affiche le bouton filtres + on réduit le contenu */
+.search-shell.on-map .chip-btn{ display:inline-flex; }
+.search-shell.on-map .grid,
+.search-shell.on-map .actions{
+  display: none;
+}
+.search-shell.on-map .filters.collapsed .grid,
+.search-shell.on-map .filters.collapsed .actions{
+  display: none;
+}
+.search-shell.on-map .filters.expanded .grid,
+.search-shell.on-map .filters.expanded .actions{
+  display: grid;
+}
+.search-shell.on-map .filters.expanded .actions{
+  display:flex;
+}
+
+/* responsive */
+@media (max-width: 620px){
+  .grid{ grid-template-columns: 1fr; }
+  .field.span2{ grid-column: auto; }
+  .search-shell.on-map .search-card{ width: min(92vw, 420px); }
+}
+/* LOGO FIXE (haut gauche) */
+.brand-fixed{
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 25000;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(15,23,42,0.10);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 14px 40px rgba(15,23,42,0.12);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-fixed img{
+  height: 26px;
+  display: block;
+}
+
+/* Au début : panneau centré */
+.search-shell{
+  position: fixed;          /* IMPORTANT: fixed plutôt que absolute */
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 20000;
+  padding: 22px;
+}
+
+/* Quand on passe "sur la carte" -> mini en haut à gauche */
+.search-shell.on-map{
+  position: fixed;
+  inset: auto;
+  top: 62px;                /* laisse la place au logo */
+  left: 14px;
+  width: auto;
+  height: auto;
+  display: block;
+  padding: 0;
+  pointer-events: none;
+}
+/* ==========================
+   LEAFLET LAYERS (dark glass premium)
+   (même style que ton panneau de recherche)
+========================== */
+
+.leaflet-top.leaflet-right{ margin-top: 14px; margin-right: 14px; }
+
+/* Boite principale */
+.leaflet-control-layers{
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+  background: rgba(31,41,55,0.92) !important;  /* #1f2937ee */
+  backdrop-filter: blur(10px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.45) !important;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+/* En mode "pas collapsed" */
+.leaflet-control-layers-expanded{
+  padding: 12px 12px 10px !important;
+  min-width: 240px;
+  max-width: 300px;
+}
+
+/* Séparateurs */
+.leaflet-control-layers-separator{
+  border-top: 1px solid rgba(255,255,255,0.14) !important;
+  margin: 10px 0 !important;
+}
+
+/* Les deux listes (Fond + Overlays) */
+.leaflet-control-layers-base,
+.leaflet-control-layers-overlays{
+  max-height: 260px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+/* Scrollbar dark (Chrome / Edge) */
+.leaflet-control-layers-base::-webkit-scrollbar,
+.leaflet-control-layers-overlays::-webkit-scrollbar{
+  width: 10px;
+}
+.leaflet-control-layers-base::-webkit-scrollbar-thumb,
+.leaflet-control-layers-overlays::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.18);
+  border-radius: 999px;
+  border: 3px solid rgba(31,41,55,0.92);
+}
+.leaflet-control-layers-base::-webkit-scrollbar-track,
+.leaflet-control-layers-overlays::-webkit-scrollbar-track{
+  background: transparent;
+}
+
+/* Ligne d’option */
+.leaflet-control-layers label{
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin: 2px 0;
+  user-select: none;
+}
+.leaflet-control-layers label:hover{
+  background: rgba(255,255,255,0.06);
+}
+
+/* Texte */
+.leaflet-control-layers label span{
+  font-size: 13px;
+  color: rgba(255,255,255,0.90);
+}
+
+/* Style des radios/checkbox (custom) */
+.leaflet-control-layers input[type="radio"],
+.leaflet-control-layers input[type="checkbox"]{
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255,255,255,0.22);
+  background: rgba(55,65,81,1); /* #374151 */
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+/* Radio rond */
+.leaflet-control-layers input[type="radio"]{
+  border-radius: 999px;
+}
+
+/* Checked = vert premium */
+.leaflet-control-layers input[type="checkbox"]:checked{
+  border-color: rgba(34,197,94,0.55);
+  background: linear-gradient(180deg, rgba(34,197,94,0.98), rgba(5,150,105,0.98));
+}
+.leaflet-control-layers input[type="radio"]:checked{
+  border-color: rgba(34,197,94,0.55);
+  background: linear-gradient(180deg, rgba(34,197,94,0.98), rgba(5,150,105,0.98));
+}
+
+/* Symbole 체크 */
+.leaflet-control-layers input[type="checkbox"]:checked::after{
+  content: "✓";
+  font-size: 12px;
+  color: #053a2b;
+  font-weight: 900;
+  transform: translateY(-0.5px);
+}
+
+/* Point radio */
+.leaflet-control-layers input[type="radio"]:checked::after{
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #053a2b;
+}
+
+/* Responsive */
+@media (max-width: 620px){
+  .leaflet-control-layers-expanded{
+    max-width: 82vw;
+  }
+}
+
+/* ==========================
+   SIDEBAR PREMIUM (bulles/modules)
+========================== */
+
+.info-sidebar-title{
+  color:#fff !important; /* tu avais un noir, sur fond dark c'est illisible */
+}
+
+.premium-wrap{
+  display:flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.premium-card{
+  background: rgba(17,24,39,0.72);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 16px;
+  padding: 12px 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.28);
+}
+
+.premium-card-head{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.premium-card-title{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.88);
+}
+
+.premium-chip{
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(34,197,94,0.35);
+  background: rgba(34,197,94,0.12);
+  color: #a7f3d0;
+  white-space: nowrap;
+}
+
+.kv-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.kv{
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 10px 10px;
+  min-width: 0;
+}
+
+.kv.full{ grid-column: 1 / -1; }
+
+.k{
+  font-size: 11px;
+  color: rgba(147,197,253,0.95);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.v{
+  font-size: 13px;
+  color: rgba(255,255,255,0.95);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.actions-row{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pbtn{
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.92);
+  border-radius: 999px;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.pbtn:hover{ background: rgba(255,255,255,0.10); }
+
+.pbtn.primary{
+  border: 1px solid rgba(34,197,94,0.35);
+  background: linear-gradient(180deg, rgba(34,197,94,0.95), rgba(5,150,105,0.95));
+  color: #053a2b;
+}
+
+.dpe-badge{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(96,165,250,0.25);
+  background: rgba(96,165,250,0.10);
+  color: rgba(255,255,255,0.92);
+  font-weight: 800;
+  font-size: 12px;
+  width: fit-content;
+}
+
+.dpe-dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+@media (max-width: 620px){
+  .kv-grid{ grid-template-columns: 1fr; }
+}
+
   </style>
 
   <!-- Librairies -->
@@ -529,137 +905,85 @@
 </head>
 <body>
 
-<!-- ÉCRAN D’OUVERTURE -->
-<div id="openingScreen" class="opening-screen">
-  <div class="opening-inner">
-    <div class="opening-header">
-      <div class="opening-logo-wrap">
-        <img src="assets/LOGO CITEEN_RVB-min.png" alt="Citeen" class="opening-logo">
-      </div>
-      <div class="opening-title-block">
-        <div class="opening-title">Citeen Cartographie</div>
-        <div class="opening-subtitle">
-          Registres de copropriétés – Île-de-France
-        </div>
-      </div>
-    </div>
-
-    <div class="opening-body">
-      Explorez le patrimoine résidentiel en copropriété en Île-de-France.
-      <br><br>
-      Chaque point correspond à une <strong>copropriété immatriculée</strong>.
-      Un clic ouvre la <strong>fiche immeuble</strong> dans le panneau latéral droit
-      (adresse, syndic, lots, période de construction…).
-    </div>
-
-    <div class="opening-footer">
-      <div class="opening-hint">
-        Étape 1 : accéder à la carte<br>
-        Étape 2 : lancer une recherche (ou afficher tout).
-      </div>
-      <div class="opening-actions">
-        <span class="badge-env">Pré-série</span>
-        <button id="enterAppBtn" class="opening-button">
-          Accéder à la carte
-          <span>⟶</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- CARTE -->
 <div id="map"></div>
+<!-- LOGO FIXE (haut gauche) -->
+<div class="brand-fixed">
+  <img src="assets/LOGO CITEEN_RVB-min.png" alt="Citeen">
+</div>
 
 <!-- PANNEAU DE RECHERCHE -->
-<div class="search-panel expanded" id="searchPanel">
+<!-- PANNEAU DE RECHERCHE (Premium) -->
+<div class="search-shell" id="searchShell">
+  <div class="search-card" id="searchPanel">
 
-  <!-- HEADER CITEEN -->
-  <div class="search-header">
-    <div class="search-logo-wrap">
-      <img
-        src="assets/LOGO CITEEN_RVB-min.png"
-        alt="Citeen"
-        class="search-logo"
-      />
-    </div>
-    <div class="search-header-text">
-      <div class="search-brand">Citeen</div>
-      <div class="search-subtitle">Recherche d'immeubles · Registre des copropriétés</div>
-    </div>
-  </div>
-
-  <!-- CHAMP PRINCIPAL -->
-  <div class="search-row">
-    <div class="search-icon-wrapper">
-      <input
-        type="text"
-        id="searchInput"
-        class="search-input"
-        placeholder="Nom de copro, adresse, voie, commune…"
-      />
-      <span class="search-icon">🔍</span>
-    </div>
-  </div>
-
-  <div id="advancedFilters">
-    <!-- SYNDIC -->
-    <div class="search-row">
-      <div style="flex:1; display:flex; flex-direction:column;">
-        <span class="filter-label">Nom du syndic</span>
-        <input
-          type="text"
-          id="syndicInput"
-          class="search-input"
-          placeholder="Ex : NEXITY, FONCIA…"
-        />
-      </div>
-    </div>
-
-    <!-- CODE POSTAL -->
-    <div class="search-row">
-      <div style="flex:0.7; display:flex; flex-direction:column;">
-        <span class="filter-label">Code postal</span>
-        <input
-          type="text"
-          id="cpInput"
-          class="search-input"
-          placeholder="Ex : 75014"
-        />
-      </div>
-
-      <div style="flex:1; display:flex; flex-direction:column;">
-        <span class="filter-label">Année construction (approx. min / max)</span>
-        <div class="search-row">
-          <input
-            type="number"
-            id="anneeMinFilter"
-            class="search-input"
-            placeholder="min (ex : 1950)"
-          />
-          <input
-            type="number"
-            id="anneeMaxFilter"
-            class="search-input"
-            placeholder="max (ex : 2000)"
-          />
+    <!-- Topbar -->
+    <div class="search-top">
+      <div class="search-branding">
+        <img src="assets/LOGO CITEEN_RVB-min.png" alt="Citeen" class="brand-logo" />
+        <div class="brand-text">
+          <div class="brand-name">Citeen</div>
+          <div class="brand-tagline">Recherche d’immeubles · Registre des copropriétés</div>
         </div>
       </div>
+
+      <!-- Bouton qui sera visible sur la carte (mode mini) -->
+      <button id="toggleFiltersBtn" class="chip-btn" type="button" aria-expanded="true">
+        Filtres
+        <span class="chev">▾</span>
+      </button>
     </div>
-  </div>
 
-  <!-- BOUTONS -->
-  <div class="search-row" style="justify-content:flex-end; margin-top:4px; gap:8px;">
-    <button id="resetBtn" class="search-button search-button-secondary">Réinitialiser</button>
-    <button id="exportBtn" class="search-button search-button-secondary">Exporter (CSV)</button>
-    <button id="searchBtn" class="search-button">Lancer la recherche</button>
-    <button id="sendToMondayBtn" class="search-button" style="background:#059669;">
-    Envoyer vers Monday
-</button>
-  </div>
+    <!-- Recherche principale (toujours visible) -->
+    <div class="search-main">
+      <div class="input-wrap">
+        <span class="input-ico">🔎</span>
+        <input
+          type="text"
+          id="searchInput"
+          class="input"
+          placeholder="Nom de copro, adresse, voie, commune…"
+        />
+        <button id="searchBtn" class="btn-primary" type="button">Rechercher</button>
+      </div>
+    </div>
 
-  <div id="status" class="search-status">Chargement des CSV…</div>
+    <!-- Filtres avancés (collapsable en mode mini) -->
+    <div class="filters" id="advancedFilters">
+      <div class="grid">
+        <div class="field">
+          <label class="label" for="syndicInput">Nom du syndic</label>
+          <input type="text" id="syndicInput" class="input" placeholder="Ex : NEXITY, FONCIA…" />
+        </div>
+
+        <div class="field">
+          <label class="label" for="cpInput">Code postal</label>
+          <input type="text" id="cpInput" class="input" placeholder="Ex : 75014" />
+        </div>
+
+        <div class="field span2">
+          <label class="label">Année construction (approx.)</label>
+          <div class="row">
+            <input type="number" id="anneeMinFilter" class="input" placeholder="Min (ex : 1950)" />
+            <input type="number" id="anneeMaxFilter" class="input" placeholder="Max (ex : 2000)" />
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="resetBtn" class="btn-ghost" type="button">Réinitialiser</button>
+        <button id="exportBtn" class="btn-ghost" type="button">Exporter (CSV)</button>
+        <button id="sendToMondayBtn" class="btn-success" type="button">Envoyer vers Monday</button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status" id="status">Chargement des CSV…</div>
+
+  </div>
 </div>
+
 
 <!-- PANNEAU INFOS À DROITE -->
 <div id="infoSidebar" class="info-sidebar">
@@ -698,7 +1022,7 @@ const COPRO_FILES = [
 const MAX_POINTS_DISPLAYED = 50000;
 
 /* API DPE ADEME */
-const DPE_API_URL = "https://data.ademe.fr/data-fair/api/v1/datasets/dpe-france/lines";
+const DPE_API_URL = "https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines";
 
 
 /* Données / index */
@@ -817,6 +1141,15 @@ function closeSidebar() {
 /* -----------------------------------------------------
    CONTENU DE LA FICHE IMMEUBLE
 ------------------------------------------------------ */
+function esc(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
 function buildSidebarHtmlForPoint(p) {
   const c = p.copro[0] || {};
 
@@ -871,82 +1204,111 @@ function buildSidebarHtmlForPoint(p) {
     c["nombre_de_lots_de_stationnement"] ||
     "";
 
-  let html = `
-    <div class="info-section">
-      <div class="info-section-title">Localisation</div>
-      <div class="info-field">
-        <span class="info-field-label">Nom de la copropriété :</span>
-        <span class="info-field-value">${nomCopro}</span>
-      </div>
-      <div class="info-field">
-        <span class="info-field-label">Adresse :</span>
-        <span class="info-field-value">
-          ${adresse || "Non renseignée"}<br>
-          ${cp || ""} ${commune || ""}
-        </span>
-      </div>
-      <div class="info-field">
-        <span class="info-field-label">Coordonnées :</span>
-        <span class="info-field-value">
-          ${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}
-        </span>
-      </div>
-    </div>
+  const gmaps = `https://www.google.com/maps?q=${p.lat},${p.lon}`;
 
-    <div class="info-section">
-      <div class="info-section-title">Copropriété</div>
-      <div class="info-field">
-        <span class="info-field-label">N° d'immatriculation :</span>
-        <span class="info-field-value">${numImmat}</span>
-      </div>
-      <div class="info-field">
-        <span class="info-field-label">Syndic :</span>
-        <span class="info-field-value">${syndic}</span>
-      </div>
-      <div class="info-field">
-        <span class="info-field-label">Type de syndic :</span>
-        <span class="info-field-value">${typeSyndic}</span>
-      </div>
-      <div class="info-field">
-        <span class="info-field-label">Période de construction :</span>
-        <span class="info-field-value">${periodeConstr}</span>
-      </div>
-      <div class="info-field">
-        <span class="info-field-label">Nombre total de lots :</span>
-        <span class="info-field-value">${nbLotsTotal}</span>
-      </div>
-  `;
+  const lotsDetail =
+    (nbLotsHab || nbLotsStationnement)
+      ? `${nbLotsHab ? esc(nbLotsHab) + " lots hab./bureaux/com." : ""}${(nbLotsHab && nbLotsStationnement) ? " · " : ""}${nbLotsStationnement ? esc(nbLotsStationnement) + " stationnement" : ""}`
+      : "—";
 
-  if (nbLotsHab || nbLotsStationnement) {
-    html += `
-      <div class="info-field">
-        <span class="info-field-label">Détail lots :</span>
-        <span class="info-field-value">
-          ${nbLotsHab ? nbLotsHab + " lots habitation/bureaux/commerces<br>" : ""}
-          ${nbLotsStationnement ? nbLotsStationnement + " lots de stationnement" : ""}
-        </span>
-      </div>
-    `;
-  }
+  const html = `
+    <div class="premium-wrap">
 
-  html += `
-    </div>
-  `;
+      <!-- LOCALISATION -->
+      <div class="premium-card">
+        <div class="premium-card-head">
+          <div class="premium-card-title">📍 Localisation</div>
+          <div class="premium-chip">${esc(cp)} ${esc(commune)}</div>
+        </div>
 
-  if (p.copro.length > 1) {
-    html += `
-      <div class="info-section">
-        <div class="info-section-title">Données sources</div>
-        <div class="info-field">
-          <span class="info-field-label">Lignes registre sur ce point :</span>
-          <span class="info-field-value">${p.copro.length}</span>
+        <div class="kv-grid">
+          <div class="kv full">
+            <div class="k">Copropriété</div>
+            <div class="v">${esc(nomCopro)}</div>
+          </div>
+
+          <div class="kv full">
+            <div class="k">Adresse</div>
+            <div class="v">${esc(adresse || "Non renseignée")}</div>
+          </div>
+
+          <div class="kv">
+            <div class="k">Latitude</div>
+            <div class="v">${Number(p.lat).toFixed(6)}</div>
+          </div>
+
+          <div class="kv">
+            <div class="k">Longitude</div>
+            <div class="v">${Number(p.lon).toFixed(6)}</div>
+          </div>
+
+          <div class="kv full">
+            <div class="k">Lien</div>
+            <div class="v"><a href="${gmaps}" target="_blank" rel="noopener" style="color:#93c5fd; text-decoration:none;">Ouvrir sur Google Maps →</a></div>
+          </div>
         </div>
       </div>
-    `;
-  }
+
+      <!-- COPROPRIÉTÉ -->
+      <div class="premium-card">
+        <div class="premium-card-head">
+          <div class="premium-card-title">🏢 Copropriété</div>
+          <div class="premium-chip">${esc(nbLotsTotal)} lots</div>
+        </div>
+
+        <div class="kv-grid">
+          <div class="kv full">
+            <div class="k">N° immatriculation</div>
+            <div class="v">${esc(numImmat)}</div>
+          </div>
+
+          <div class="kv full">
+            <div class="k">Syndic</div>
+            <div class="v">${esc(syndic)}</div>
+          </div>
+
+          <div class="kv">
+            <div class="k">Type</div>
+            <div class="v">${esc(typeSyndic)}</div>
+          </div>
+
+          <div class="kv">
+            <div class="k">Période</div>
+            <div class="v">${esc(periodeConstr)}</div>
+          </div>
+
+          <div class="kv full">
+            <div class="k">Détail lots</div>
+            <div class="v">${lotsDetail}</div>
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button class="pbtn primary" id="exportImmeubleBtn" type="button">Exporter cette fiche (CSV)</button>
+        </div>
+      </div>
+
+      <!-- DPE : bloc placeholder (rempli après fetch) -->
+      <div class="premium-card" id="dpeCard">
+        <div class="premium-card-head">
+          <div class="premium-card-title">🔋 DPE</div>
+          <div class="premium-chip">Chargement…</div>
+        </div>
+
+        <div class="kv-grid">
+          <div class="kv full">
+            <div class="k">Statut</div>
+            <div class="v">Récupération des diagnostics ADEME…</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `;
 
   return { title: nomCopro, html };
 }
+
 
 /* -----------------------------------------------------
    CARTE LEAFLET + FONDS
@@ -955,124 +1317,201 @@ function buildSidebarHtmlForPoint(p) {
 async function fetchDPEForCoordinates(lat, lon) {
   const key = lat.toFixed(6) + "|" + lon.toFixed(6);
 
-  if (dpeCache.has(key)) {
-    return dpeCache.get(key);
-  }
+  // Cache
+  if (dpeCache.has(key)) return dpeCache.get(key);
 
-  const url = `${DPE_API_URL}?size=1&geo_distance=${lon},${lat},25`;
+  // Nouvelle API ADEME : récupérer TOUS les DPE autour du point
+  const url = `${DPE_API_URL}?size=2000&geo_distance=${lon},${lat},50`;
 
   try {
     const res = await fetch(url);
+
     if (!res.ok) {
-      dpeCache.set(key, null);
-      return null;
+      console.warn("Erreur API ADEME", res.status);
+      dpeCache.set(key, []);
+      return [];
     }
 
     const data = await res.json();
-    const dpe = data?.results?.[0] || null;
+    const dpeList = data?.results || [];
 
-    dpeCache.set(key, dpe);
-    return dpe;
+    dpeCache.set(key, dpeList);
+    return dpeList;
 
   } catch (e) {
-    console.error("Erreur DPE API :", e);
-    dpeCache.set(key, null);
-    return null;
+    console.error("Erreur API ADEME", e);
+    dpeCache.set(key, []);
+    return [];
   }
 }
 
 
-function appendDPEToSidebar(dpe) {
+function appendDPEToSidebar(dpeList) {
   if (!infoSidebarContentEl) return;
 
+  const has = Array.isArray(dpeList) && dpeList.length > 0;
+
+  // petit helper anti XSS basique
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (m) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[m]));
+
+  // KPI helpers
+  const pick = (obj, keys, fallback="Non renseigné") => {
+    for (const k of keys) {
+      const val = obj?.[k];
+      if (val !== undefined && val !== null && String(val).trim() !== "") return val;
+    }
+    return fallback;
+  };
+
+  // On prend le "meilleur résumé" : si plusieurs DPE, on affiche un mini résumé + détails
+  let badgeClass = "none";
+  let badgeText = "Aucun DPE";
+  let headlineClasse = "NR";
+  let headlineGes = "NR";
+  let headlineType = "—";
+  let headlineDate = "—";
+  let headlineChauffage = "—";
+
+  if (has) {
+    badgeClass = "ok";
+    badgeText = `${dpeList.length} DPE trouvé${dpeList.length > 1 ? "s" : ""}`;
+
+    // on prend le premier pour le "headline" (tu peux changer la logique plus tard)
+    const d0 = dpeList[0] || {};
+    headlineClasse = pick(d0, ["etiquette_dpe"], "NR");
+    headlineGes = pick(d0, ["etiquette_ges"], "NR");
+    headlineType = d0.numero_dpe_immeuble_associe ? "Collectif" : "Individuel";
+    headlineDate = pick(d0, ["date_etablissement_dpe"], "Non renseignée");
+    headlineChauffage = pick(d0, ["type_installation_chauffage"], "Non renseigné");
+
+    // Si la classe est NR mais on a bien des DPE, on évite le "ok" trop fort
+    if (String(headlineClasse).toUpperCase() === "NR") badgeClass = "warn";
+  }
+
   let html = `
-    <div class="info-section">
-      <div class="info-section-title">Diagnostic énergétique 🔋</div>
+    <div class="premium-wrap">
+
+      <div class="premium-card">
+        <div class="premium-head">
+          <div>
+            <div class="premium-title">🔋 Diagnostic énergétique</div>
+            <div class="premium-sub">Synthèse DPE (autour du point)</div>
+          </div>
+          <span class="badge ${badgeClass}">${esc(badgeText)}</span>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi">
+            <div class="k">Type</div>
+            <div class="v">${esc(headlineType)}</div>
+          </div>
+
+          <div class="kpi">
+            <div class="k">Date</div>
+            <div class="v">${esc(headlineDate)}</div>
+          </div>
+
+          <div class="kpi">
+            <div class="k">Classe énergie</div>
+            <div class="v">${esc(headlineClasse)}</div>
+          </div>
+
+          <div class="kpi">
+            <div class="k">Classe GES</div>
+            <div class="v">${esc(headlineGes)}</div>
+          </div>
+
+          <div class="kpi" style="grid-column:1/-1;">
+            <div class="k">Chauffage</div>
+            <div class="v small">${esc(headlineChauffage)}</div>
+          </div>
+        </div>
+
+        
   `;
 
-  if (!dpe) {
-    html += `<div class="info-field">Aucun DPE trouvé.</div></div>`;
-    infoSidebarContentEl.innerHTML += html;
-    return;
-  }
+  // Détails si plusieurs DPE
+  if (has && dpeList.length > 1) {
+    html += `
+      <div class="premium-card">
+        <div class="premium-head">
+          <div>
+            <div class="premium-title">📄 Détails</div>
+            <div class="premium-sub">Liste des DPE détectés</div>
+          </div>
+          <span class="badge">${esc(dpeList.length)} éléments</span>
+        </div>
 
-  // Détermination du type (individuel / collectif)
-  let typeDPE = "Individuel";
-  if (dpe.tr002_type_batiment_description) {
-    const t = dpe.tr002_type_batiment_description.toLowerCase();
-    if (t.includes("immeuble") || t.includes("collectif")) {
-      typeDPE = "Collectif";
+        <div class="kpis">
+    `;
+
+    dpeList.slice(0, 12).forEach((dpe, idx) => {
+      const typeDPE = dpe.numero_dpe_immeuble_associe ? "Collectif" : "Individuel";
+      const numeroDpe = pick(dpe, ["numero_dpe"], "Non renseigné");
+      const dateDpe = pick(dpe, ["date_etablissement_dpe"], "Non renseignée");
+      const classeE = pick(dpe, ["etiquette_dpe"], "NR");
+      const classeG = pick(dpe, ["etiquette_ges"], "NR");
+
+      html += `
+        <div class="kpi" style="grid-column:1/-1;">
+          <div class="k">DPE #${idx + 1} • ${esc(typeDPE)}</div>
+          <div class="v small">${esc(numeroDpe)}</div>
+          <div class="k" style="margin-top:6px;">Date • Classe énergie • GES</div>
+          <div class="v small">${esc(dateDpe)} • ${esc(classeE)} • ${esc(classeG)}</div>
+        </div>
+      `;
+    });
+
+    if (dpeList.length > 12) {
+      html += `
+        <div class="kpi" style="grid-column:1/-1;">
+          <div class="k">…</div>
+          <div class="v small">+${esc(dpeList.length - 12)} DPE supplémentaires (non affichés)</div>
+        </div>
+      `;
     }
+
+    html += `
+        </div>
+      </div>
+    `;
   }
 
-  // Énergie de chauffage principal
-  const energieChauffage =
-    dpe.energie_chauffage ||
-    dpe.energie_chauffage_1 ||
-    dpe.energie_emetteur ||
-    "Non renseignée";
+  html += `</div>`; // end premium-wrap
 
-  html += `
-    <div class="info-field">
-      <span class="info-field-label">Numéro DPE :</span>
-      <span class="info-field-value">${dpe.numero_dpe || "Non renseigné"}</span>
-    </div>
-
-    <div class="info-field">
-      <span class="info-field-label">Date du DPE :</span>
-      <span class="info-field-value">${dpe.date_etablissement_dpe || "Non renseignée"}</span>
-    </div>
-
-    <div class="info-field">
-      <span class="info-field-label">Type de DPE :</span>
-      <span class="info-field-value">${typeDPE}</span>
-    </div>
-
-    <div class="info-field">
-      <span class="info-field-label">Énergie chauffage principal :</span>
-      <span class="info-field-value">${energieChauffage}</span>
-    </div>
-
-    <div class="info-field">
-      <span class="info-field-label">Classe énergie :</span>
-      <span class="info-field-value">${dpe.classe_consommation_energie || "NR"}</span>
-    </div>
-
-    <div class="info-field">
-      <span class="info-field-label">Consommation énergie :</span>
-      <span class="info-field-value">${dpe.consommation_energie || "NR"}</span>
-    </div>
-
-    <div class="info-field">
-      <span class="info-field-label">Classe GES :</span>
-      <span class="info-field-value">${dpe.classe_estimation_ges || "NR"}</span>
-    </div>
-  </div>`;
-  
   infoSidebarContentEl.innerHTML += html;
+
+  // Activation du bouton export
+  const btn = document.getElementById("exportImmeubleBtn");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      exportSingleImmeubleToCSV(window.selectedCoproForMonday);
+    });
+  }
 }
 
 
 function initMap() {
-  baseOSM = L.tileLayer(
-    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }
-  );
+  // 1) Fonds
+  baseOSM = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  });
 
   googleSat = L.gridLayer.googleMutant({
     type: "satellite",
     maxZoom: 21
   });
 
+  // 2) Carte
   const boundsIDF = [
     [48.0, 1.4],
     [49.2, 3.6]
   ];
 
-  map = L.map('map', {
+  map = L.map("map", {
     center: [48.8566, 2.3522],
     zoom: 11,
     layers: [baseOSM]
@@ -1083,68 +1522,67 @@ function initMap() {
   map.options.maxBoundsViscosity = 1.0;
   map.fitBounds(boundsIDF);
 
+  // 3) Layer group principal (IMPORTANT)
   markerLayer = L.layerGroup().addTo(map);
 
+  // 4) Control layers (Fond + DPE)
   const baseLayers = {
     "Fond OSM": baseOSM,
     "Satellite Google": googleSat
   };
 
- const dpeOverlays = {
-  // Type de bâtiment
-  "DPE collectif": dpeCollectifLayer,
-  "DPE individuel": dpeIndividuelLayer,
-  "Sans données DPE": dpeNoneLayer,
+  const dpeOverlays = {
+    "DPE collectif": dpeCollectifLayer,
+    "DPE individuel": dpeIndividuelLayer,
+    "Sans données DPE": dpeNoneLayer,
+    "Classe A": dpeClassLayers["A"],
+    "Classe B": dpeClassLayers["B"],
+    "Classe C": dpeClassLayers["C"],
+    "Classe D": dpeClassLayers["D"],
+    "Classe E": dpeClassLayers["E"],
+    "Classe F": dpeClassLayers["F"],
+    "Classe G": dpeClassLayers["G"]
+  };
 
-  // Classes énergétiques
-  "Classe A": dpeClassLayers["A"],
-  "Classe B": dpeClassLayers["B"],
-  "Classe C": dpeClassLayers["C"],
-  "Classe D": dpeClassLayers["D"],
-  "Classe E": dpeClassLayers["E"],
-  "Classe F": dpeClassLayers["F"],
-  "Classe G": dpeClassLayers["G"]
-};
-
-
-L.control.layers(baseLayers, dpeOverlays, {
+  L.control.layers(baseLayers, dpeOverlays, {
     position: "topright",
     collapsed: false
-}).addTo(map);
+  }).addTo(map);
 
-// Ajoute les calques sur la carte
-dpeCollectifLayer.addTo(map);
-dpeIndividuelLayer.addTo(map);
-dpeNoneLayer.addTo(map);
-// Ajout des calques DPE A→G activés par défaut
-Object.values(dpeClassLayers).forEach(layer => layer.addTo(map));
+  // 5) Ajoute les calques DPE sur la carte (sinon ils restent vides/inactifs)
+  dpeCollectifLayer.addTo(map);
+  dpeIndividuelLayer.addTo(map);
+  dpeNoneLayer.addTo(map);
+  Object.values(dpeClassLayers).forEach(layer => layer.addTo(map));
 
-
-
+  // 6) Toggle OSM/Sat custom (boutons OSM / Sat)
   const BaseMapToggle = L.Control.extend({
-    options: { position: 'topleft' },
-    onAdd: function(map) {
-      const container = L.DomUtil.create('div', 'leaflet-control leaflet-bar leaflet-control-basemap-toggle');
+    options: { position: "topleft" },
+    onAdd: function(_map) {
+      const container = L.DomUtil.create(
+        "div",
+        "leaflet-control leaflet-bar leaflet-control-basemap-toggle"
+      );
 
-      btnOSMRef = L.DomUtil.create('a', '', container);
-      btnOSMRef.href = '#';
-      btnOSMRef.innerHTML = 'OSM';
-      btnOSMRef.classList.add('active');
+      btnOSMRef = L.DomUtil.create("a", "", container);
+      btnOSMRef.href = "#";
+      btnOSMRef.innerHTML = "OSM";
+      btnOSMRef.classList.add("active");
 
-      btnSatRef = L.DomUtil.create('a', '', container);
-      btnSatRef.href = '#';
-      btnSatRef.innerHTML = 'Sat';
+      btnSatRef = L.DomUtil.create("a", "", container);
+      btnSatRef.href = "#";
+      btnSatRef.innerHTML = "Sat";
 
       L.DomEvent.disableClickPropagation(container);
 
-      L.DomEvent.on(btnOSMRef, 'click', function (e) {
+      L.DomEvent.on(btnOSMRef, "click", (e) => {
         L.DomEvent.preventDefault(e);
-        setBaseLayer('osm');
+        setBaseLayer("osm");
       });
 
-      L.DomEvent.on(btnSatRef, 'click', function (e) {
+      L.DomEvent.on(btnSatRef, "click", (e) => {
         L.DomEvent.preventDefault(e);
-        setBaseLayer('sat');
+        setBaseLayer("sat");
       });
 
       return container;
@@ -1153,10 +1591,10 @@ Object.values(dpeClassLayers).forEach(layer => layer.addTo(map));
 
   map.addControl(new BaseMapToggle());
 
-  map.on("click", () => {
-    closeSidebar();
-  });
+  // 7) Clic sur la carte = fermer sidebar
+  map.on("click", () => closeSidebar());
 }
+
 
 function setBaseLayer(mode) {
   currentBase = mode;
@@ -1247,7 +1685,6 @@ function renderPoints(points) {
   dpeNoneLayer.clearLayers();
   Object.values(dpeClassLayers).forEach(layer => layer.clearLayers());
 
-
   const bounds = [];
   let displayed = 0;
 
@@ -1258,11 +1695,31 @@ function renderPoints(points) {
     const lon = p.lon;
     if (!isFinite(lat) || !isFinite(lon)) continue;
 
-    // Création du marker
+    /* --------------------------------------------------
+       1) Déterminer la couleur AVANT création du marker
+    -------------------------------------------------- */
+    let markerColor = "#000000"; // Noir = pas de DPE par défaut
+
+    const cacheKey = lat.toFixed(6) + "|" + lon.toFixed(6);
+    const cachedDPE = dpeCache.get(cacheKey);
+
+if (cachedDPE && cachedDPE.length > 0) {
+  const hasCollectif = cachedDPE.some(d => d.numero_dpe_immeuble_associe);
+  const hasIndividuel = cachedDPE.some(d => !d.numero_dpe_immeuble_associe);
+
+  if (hasCollectif) markerColor = "#3388ff"; // bleu
+  else if (hasIndividuel) markerColor = "#ff0000"; // rouge
+  else markerColor = "#000000"; // noir
+}
+
+
+    /* --------------------------------------------------
+       2) Création du marker
+    -------------------------------------------------- */
     const marker = L.circleMarker([lat, lon], {
       radius: 5,
-      color: "#0044ff",
-      fillColor: "#3388ff",
+      color: markerColor,
+      fillColor: markerColor,
       fillOpacity: 0.85,
       weight: 1
     }).on("click", async (e) => {
@@ -1283,42 +1740,54 @@ function renderPoints(points) {
       appendDPEToSidebar(dpeFull);
     });
 
-    // Tous les markers dans le layer "général"
+    // Ajout aux calques par défaut
     markerLayer.addLayer(marker);
+    dpeNoneLayer.addLayer(marker); // si pas de DPE → noir
 
-    // Par défaut → Sans DPE
-    dpeNoneLayer.addLayer(marker);
-
-    // Chargement du DPE en arrière-plan pour répartir dans les bons calques
+    /* --------------------------------------------------
+       3) Mise à jour couleur après récupération du DPE
+    -------------------------------------------------- */
     fetchDPEForCoordinates(lat, lon)
-  .then((dpe) => {
-    if (!dpe) return;
+  .then((dpeList) => {
+    if (!dpeList || dpeList.length === 0) {
+      marker.setStyle({ color: "#000000", fillColor: "#000000" });
+      return;
+    }
 
-    const desc = (dpe.tr002_type_batiment_description || "").toLowerCase();
+    // y a-t-il un DPE collectif ?
+   const hasCollectif = dpeList.some(d => d.numero_dpe_immeuble_associe);
+const hasIndividuel = dpeList.some(d => !d.numero_dpe_immeuble_associe);
 
-    // Retirer du calque "Sans DPE"
+
     dpeNoneLayer.removeLayer(marker);
 
-    if (desc.includes("collectif") || desc.includes("immeuble")) {
+    if (hasCollectif) {
+      marker.setStyle({ color: "#3388ff", fillColor: "#3388ff" });
       dpeCollectifLayer.addLayer(marker);
-    } else {
+
+    } else if (hasIndividuel) {
+      marker.setStyle({ color: "#ff0000", fillColor: "#ff0000" });
       dpeIndividuelLayer.addLayer(marker);
+
+    } else {
+      marker.setStyle({ color: "#000000", fillColor: "#000000" });
+      dpeNoneLayer.addLayer(marker);
     }
 
-    // Ajout au calque de classe énergétique (A→G)
-    const classe = (dpe.classe_consommation_energie || "").toUpperCase();
-    if (["A","B","C","D","E","F","G"].includes(classe)) {
-      dpeClassLayers[classe].addLayer(marker);
-    }
-
+    // Ajout classes énergétiques (toutes)
+    dpeList.forEach(d => {
+      const classe = (d.etiquette_dpe || "").toUpperCase();
+      if (["A","B","C","D","E","F","G"].includes(classe)) {
+        dpeClassLayers[classe].addLayer(marker);
+      }
+    });
   })
   .catch((err) => {
     console.error("Erreur DPE pour calques :", err);
   });
 
-bounds.push([lat, lon]);
-displayed++;
-
+    bounds.push([lat, lon]);
+    displayed++;
   }
 
   if (bounds.length > 0) {
@@ -1434,27 +1903,45 @@ async function exportFilteredToCSV() {
   }
 
   // 2. Enrichir les lignes des registres avec les champs DPE
-  const enrichedRows = lastFilteredCoproRows.map(row => {
-    const coords = getLatLonFromCoproRow(row);
-    if (!coords) return row;
+const enrichedRows = [];
 
-    const [lat, lon] = coords;
-    const key = lat.toFixed(6) + "|" + lon.toFixed(6);
-    const dpe = dpeCache.get(key);
+lastFilteredCoproRows.forEach(row => {
+  const coords = getLatLonFromCoproRow(row);
+  if (!coords) {
+    enrichedRows.push({ ...row });
+    return;
+  }
 
-    return {
+  const [lat, lon] = coords;
+  const key = lat.toFixed(6) + "|" + lon.toFixed(6);
+  const dpeList = dpeCache.get(key) || [];
+
+  if (dpeList.length === 0) {
+    // Pas de DPE → ligne simple
+    enrichedRows.push({
       ...row,
-      dpe_numero: dpe?.numero_dpe || "",
-      dpe_date: dpe?.date_etablissement_dpe || "",
-      dpe_classe_energie: dpe?.classe_consommation_energie || "",
-      dpe_conso: dpe?.consommation_energie || "",
-      dpe_classe_ges: dpe?.classe_estimation_ges || "",
-      dpe_energie_chauffage:
-        dpe?.energie_chauffage ||
-        dpe?.energie_chauffage_1 ||
-        ""
-    };
-  });
+      dpe_type: "",
+      dpe_numero: "",
+      dpe_date: "",
+      dpe_classe_energie: "",
+      dpe_classe_ges: "",
+      dpe_energie_chauffage: ""
+    });
+  } else {
+    // 1 ligne PAR DPE
+    dpeList.forEach(dpe => {
+      enrichedRows.push({
+        ...row,
+        dpe_type: dpe.numero_dpe_immeuble_associe ? "Collectif" : "Individuel",
+        dpe_numero: dpe.numero_dpe || "",
+        dpe_date: dpe.date_etablissement_dpe || "",
+        dpe_classe_energie: dpe.etiquette_dpe || "",
+        dpe_classe_ges: dpe.etiquette_ges || "",
+        dpe_energie_chauffage: dpe.type_installation_chauffage || ""
+      });
+    });
+  }
+});
 
   // 3. Conversion CSV
   const csv = Papa.unparse(enrichedRows, { delimiter: ";" });
@@ -1469,6 +1956,89 @@ async function exportFilteredToCSV() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+/* -----------------------------------------------------
+   EXPORT CSV – UNE SEULE FICHE IMMEUBLE
+------------------------------------------------------ */
+function exportSingleImmeubleToCSV(p) {
+  if (!p) {
+    alert("Aucune fiche immeuble sélectionnée.");
+    return;
+  }
+
+  const c = p.copro[0] || {};
+
+  // Données immeuble
+  const immeubleInfo = {
+    nom: c["nom_d_usage_de_la_copropriete"] || "",
+    adresse:
+      ((c["numero_et_voie_adresse_de_reference"] || "") + " " +
+      (c["adresse_complementaire_1"] || "") + " " +
+      (c["adresse_de_reference"] || "")).replace(/\s\s+/g, " ").trim(),
+    cp: c["code_postal_adresse_de_reference"] || "",
+    ville: c["commune_adresse_de_reference"] || "",
+    syndic: c["raison_sociale_du_representant_legal"] || "",
+    lots_total: c["nombre_total_de_lots"] || "",
+    periode: c["periode_de_construction"] || "",
+    latitude: p.lat,
+    longitude: p.lon
+  };
+
+  // 🔥 Récupérer les DPE du cache
+  const key = `${p.lat.toFixed(6)}|${p.lon.toFixed(6)}`;
+  const dpeList = dpeCache.get(key) || [];
+
+  let rows = [];
+
+  // 🔥 S'il y a des DPE → 1 ligne par DPE
+  if (dpeList.length > 0) {
+    rows = dpeList.map(d => ({
+      ...immeubleInfo,
+      dpe_numero: d.numero_dpe || "",
+      dpe_date: d.date_etablissement_dpe || "",
+      dpe_type: d.numero_dpe_immeuble_associe ? "Collectif" : "Individuel",
+      dpe_classe_energie: d.etiquette_dpe || "",
+      dpe_conso:
+        d.consommation_energie ||
+        d.consommation_energie_5_usages || "",
+      dpe_ges: d.etiquette_ges || "",
+      dpe_energie_chauffage:
+        d.type_installation_chauffage ||
+        d.type_energie_chauffage ||
+        d.energie_chauffage ||
+        ""
+    }));
+  }
+
+  // ❗️S'il n'y a AUCUN DPE → une seule ligne immeuble
+  else {
+    rows.push({
+      ...immeubleInfo,
+      dpe_numero: "",
+      dpe_date: "",
+      dpe_type: "",
+      dpe_classe_energie: "",
+      dpe_conso: "",
+      dpe_ges: "",
+      dpe_energie_chauffage: ""
+    });
+  }
+
+  // Convertir en CSV
+  const csv = Papa.unparse(rows, { delimiter: ";" });
+
+  // Télécharger
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `fiche_immeuble_${immeubleInfo.nom.replace(/\s+/g, "_")}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
   URL.revokeObjectURL(url);
 }
 
@@ -1490,9 +2060,22 @@ function resetFilters() {
   hasSearched = false;
   searchPanelMinimized = false;
 
-  const panel = document.getElementById("searchPanel");
-  panel.classList.remove("mini");
-  panel.classList.add("expanded");
+    const searchShell = document.getElementById("searchShell");
+  if (searchShell) searchShell.classList.remove("on-map");
+
+  const advancedFilters = document.getElementById("advancedFilters");
+  if (advancedFilters) {
+    advancedFilters.classList.add("expanded");
+    advancedFilters.classList.remove("collapsed");
+  }
+
+  const toggleFiltersBtn = document.getElementById("toggleFiltersBtn");
+  if (toggleFiltersBtn) {
+    toggleFiltersBtn.setAttribute("aria-expanded", "true");
+    const chev = toggleFiltersBtn.querySelector(".chev");
+    if (chev) chev.textContent = "▾";
+  }
+
 
   const statusEl = document.getElementById("status");
   statusEl.innerText =
@@ -1506,9 +2089,24 @@ function resetFilters() {
 ------------------------------------------------------ */
 function minimizeSearchPanel() {
   if (searchPanelMinimized) return;
-  const panel = document.getElementById("searchPanel");
-  panel.classList.remove("expanded");
-  panel.classList.add("mini");
+
+  const searchShell = document.getElementById("searchShell");
+  if (searchShell) searchShell.classList.add("on-map");
+
+  // en mode mini on ferme les filtres par défaut
+  const advancedFilters = document.getElementById("advancedFilters");
+  if (advancedFilters) {
+    advancedFilters.classList.remove("expanded");
+    advancedFilters.classList.add("collapsed");
+  }
+
+  const toggleFiltersBtn = document.getElementById("toggleFiltersBtn");
+  if (toggleFiltersBtn) {
+    toggleFiltersBtn.setAttribute("aria-expanded", "false");
+    const chev = toggleFiltersBtn.querySelector(".chev");
+    if (chev) chev.textContent = "▾";
+  }
+
   searchPanelMinimized = true;
 }
 
@@ -1542,6 +2140,43 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetBtn    = document.getElementById("resetBtn");
   const exportBtn   = document.getElementById("exportBtn");
   const searchInput = document.getElementById("searchInput");
+    // --- Mode "carte" (mini panneau) + bouton Filtres ---
+  const searchShell = document.getElementById("searchShell");
+  const toggleFiltersBtn = document.getElementById("toggleFiltersBtn");
+  const advancedFilters = document.getElementById("advancedFilters");
+
+  // état filtres en mode mini
+  let filtersOpen = false;
+
+  function setOnMapMode(onMap) {
+    if (!searchShell) return;
+    if (onMap) searchShell.classList.add("on-map");
+    else searchShell.classList.remove("on-map");
+  }
+
+  function setFilters(open) {
+    if (!advancedFilters) return;
+    filtersOpen = open;
+
+    // on utilise les classes collapsed/expanded prévues dans ton CSS
+    advancedFilters.classList.toggle("expanded", open);
+    advancedFilters.classList.toggle("collapsed", !open);
+
+    if (toggleFiltersBtn) {
+      toggleFiltersBtn.setAttribute("aria-expanded", String(open));
+      toggleFiltersBtn.querySelector(".chev").textContent = open ? "▴" : "▾";
+    }
+  }
+
+  // au départ: centré, filtres visibles (par défaut)
+  setOnMapMode(false);
+  setFilters(true);
+
+  if (toggleFiltersBtn) {
+    toggleFiltersBtn.addEventListener("click", () => {
+      setFilters(!filtersOpen);
+    });
+  }
 
   if (searchBtn) {
     searchBtn.addEventListener("click", () => {
