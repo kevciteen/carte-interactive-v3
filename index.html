@@ -1032,6 +1032,8 @@ let lastFilteredPoints = [];
 let lastFilteredCoproRows = [];
 /* Cache DPE pour éviter les appels multiples */
 const dpeCache = new Map(); // key "lat|lon" -> dpe object
+let pointList = []; // tableau des points pour recherche "nearest"
+
 
 
 /* Carte / couches */
@@ -1055,6 +1057,194 @@ const dpeClassLayers = {
   "G": L.layerGroup()
 };
 
+// ===== BÂTIMENTS OSM (Overpass) =====
+let buildingsLayer;
+const overpassCache = new Map();
+let overpassInFlight = false;
+let buildingsTimer = null;
+
+function bboxKey(b, z) {
+  const r = (n) => Number(n).toFixed(4);
+  return `${z}|${r(b.getSouth())},${r(b.getWest())},${r(b.getNorth())},${r(b.getEast())}`;
+}
+
+function overpassToGeoJSON(osm) {
+  const features = [];
+  const els = osm?.elements || [];
+
+  for (const el of els) {
+    const tags = el.tags || {};
+    if (!tags.building) continue;
+
+    // Version simple : "ways" (la majorité des bâtiments)
+    if (el.type === "way" && Array.isArray(el.geometry)) {
+      const coords = el.geometry.map(g => [g.lon, g.lat]);
+
+      if (coords.length > 2) {
+        const first = coords[0];
+        const last = coords[coords.length - 1];
+        if (first[0] !== last[0] || first[1] !== last[1]) coords.push(first);
+
+        features.push({
+          type: "Feature",
+          properties: tags,
+          geometry: { type: "Polygon", coordinates: [coords] }
+        });
+      }
+    }
+  }
+
+  return { type: "FeatureCollection", features };
+}
+
+async function loadBuildingsFromOverpass() {
+  if (!map || !buildingsLayer) return;
+
+  const z = map.getZoom();
+
+  // important perf : pas de bâtiments si zoom trop faible
+  if (z < 16) {
+    buildingsLayer.clearLayers();
+    return;
+  }
+
+  const b = map.getBounds();
+  const key = bboxKey(b, z);
+
+  if (overpassCache.has(key)) {
+    buildingsLayer.clearLayers();
+    buildingsLayer.addData(overpassCache.get(key));
+    recolorVisibleBuildings();
+    return;
+  }
+
+  if (overpassInFlight) return;
+  overpassInFlight = true;
+
+  const s = b.getSouth(), w = b.getWest(), n = b.getNorth(), e = b.getEast();
+
+  const query = `
+[out:json][timeout:25];
+(
+  way["building"](${s},${w},${n},${e});
+  relation["building"](${s},${w},${n},${e});
+);
+out body geom;
+  `.trim();
+
+  try {
+    const res = await fetch("https://overpass-api.de/api/interpreter", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+      body: "data=" + encodeURIComponent(query)
+    });
+
+    if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`);
+    const data = await res.json();
+
+    const geojson = overpassToGeoJSON(data);
+    overpassCache.set(key, geojson);
+
+    buildingsLayer.clearLayers();
+    buildingsLayer.addData(geojson);
+
+  } catch (err) {
+    console.warn("Overpass error:", err);
+  } finally {
+    overpassInFlight = false;
+  }
+}
+
+function scheduleBuildingsReload() {
+  clearTimeout(buildingsTimer);
+  buildingsTimer = setTimeout(loadBuildingsFromOverpass, 350);
+}
+let recolorJobId = 0;
+async function recolorVisibleBuildings() {
+  if (!buildingsLayer) return;
+  const jobId = ++recolorJobId;
+
+  const layers = [];
+  buildingsLayer.eachLayer(l => layers.push(l));
+  const MAX = Math.min(layers.length, 250); // évite de tuer le navigateur
+
+  const queue = layers.slice(0, MAX);
+  const CONCURRENCY = 4;
+
+  async function worker() {
+    while (queue.length) {
+      if (jobId !== recolorJobId) return;
+
+      const layer = queue.pop();
+      const feature = layer?.feature;
+      if (!feature) continue;
+
+      // déjà calculé -> on skip
+      if (Number.isFinite(feature.properties?._dpeConso)) continue;
+
+      const center = layer.getBounds().getCenter();
+      const nearest = findNearestCoproPoint(center.lat, center.lng, 60);
+      const coproPoint = nearest?.point;
+      if (!coproPoint) continue;
+
+      const dpeFull = await fetchDPEForCoordinates(coproPoint.lat, coproPoint.lon);
+      const conso = computeBuildingConso(dpeFull, 5);
+      feature.properties._dpeConso = conso;
+
+      layer.setStyle({
+        fillColor: consoToColor(conso, 70, 300),
+        fillOpacity: 0.45,
+        color: "#0f172a",
+        weight: 1,
+        opacity: 0.8
+      });
+    }
+  }
+
+  await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+}
+
+
+async function recolorVisibleBuildings() {
+  if (!buildingsLayer) return;
+
+  const jobId = ++recolorJobId;
+
+  const layers = [];
+  buildingsLayer.eachLayer(l => layers.push(l));
+
+  // petite limite pour éviter de tuer l'API si tu as 2000 bâtiments
+  const MAX = Math.min(layers.length, 250);
+
+  for (let i = 0; i < MAX; i++) {
+    if (jobId !== recolorJobId) return; // si on a relancé un job plus récent, on stop
+
+    const layer = layers[i];
+    const feature = layer.feature;
+    if (!feature) continue;
+
+    // déjà calculé ? on skip
+    if (Number.isFinite(feature.properties?._dpeConso)) continue;
+
+    const center = layer.getBounds().getCenter();
+    const nearest = findNearestCoproPoint(center.lat, center.lng, 60);
+    const coproPoint = nearest?.point;
+    if (!coproPoint) continue;
+
+    const dpeFull = await fetchDPEForCoordinates(coproPoint.lat, coproPoint.lon);
+    const conso = computeBuildingConso(dpeFull, 5);
+    feature.properties._dpeConso = conso;
+
+    layer.setStyle({
+      fillColor: consoToColor(conso, 70, 300),
+      fillOpacity: 0.45,
+      color: "#0f172a",
+      weight: 1,
+      opacity: 0.8
+    });
+  }
+}
+
 
 /* UI */
 let hasSearched = false;
@@ -1068,8 +1258,41 @@ let infoSidebarTitleEl = null;
 ------------------------------------------------------ */
 function parseNumberFlexible(value) {
   if (value === undefined || value === null || value === "") return NaN;
-  const num = parseFloat(String(value).replace(",", "."));
-  return isFinite(num) ? num : NaN;
+  if (typeof value === "number") return Number.isFinite(value) ? value : NaN;
+
+  const s = String(value)
+    .trim()
+    .replace(/\s+/g, "")        // enlève espaces
+    .replace(",", ".")          // virgule -> point
+    .replace(/[^0-9.+-]/g, ""); // enlève unités éventuelles
+
+  const num = Number(s);
+  return Number.isFinite(num) ? num : NaN;
+}
+
+
+function haversineMeters(lat1, lon1, lat2, lon2){
+  const R = 6371000;
+  const toRad = (d) => d * Math.PI / 180;
+  const dLat = toRad(lat2-lat1);
+  const dLon = toRad(lon2-lon1);
+  const a =
+    Math.sin(dLat/2)**2 +
+    Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+
+function findNearestCoproPoint(lat, lon, maxMeters = 60){
+  let best = null;
+  let bestD = Infinity;
+
+  for (const p of pointList) {
+    const d = haversineMeters(lat, lon, p.lat, p.lon);
+    if (d < bestD) { bestD = d; best = p; }
+  }
+
+  if (best && bestD <= maxMeters) return { point: best, distance: bestD };
+  return null;
 }
 
 /* -----------------------------------------------------
@@ -1493,6 +1716,98 @@ function appendDPEToSidebar(dpeList) {
 }
 
 
+function parseDateSafe(s) {
+  const t = Date.parse(s);
+  return isFinite(t) ? t : 0;
+}
+
+function clamp01(x) {
+  return Math.max(0, Math.min(1, x));
+}
+
+function mix(a, b, t) { return a + (b - a) * t; }
+
+function consoToColor(conso, minKwh = 50, maxKwh = 450) {
+  if (conso === null || conso === undefined || conso === "") return "#9CA3AF"; // gris
+  const v = Number(conso);
+  if (!Number.isFinite(v)) return "#9CA3AF";
+
+  const t = clamp01((v - minKwh) / (maxKwh - minKwh));
+
+  const r = Math.round(mix(34, 239, t));
+  const g = Math.round(mix(197, 68, t));
+  const b = Math.round(mix(94, 68, t));
+  return `rgb(${r},${g},${b})`;
+}
+
+
+function pickFirstNumber(obj, keys) {
+  for (const k of keys) {
+    const v = parseNumberFlexible(obj?.[k]);
+    if (isFinite(v)) return v;
+  }
+  return NaN;
+}
+
+/**
+ * Règle:
+ * - si collectif présent => dernier collectif (date max)
+ * - sinon => moyenne des N derniers individuels (par date)
+ *
+ * Retourne un nombre (kWh/m²/an) ou null si impossible.
+ */
+function computeBuildingConso(dpeList, nRecentIndiv = 5) {
+  if (!Array.isArray(dpeList) || dpeList.length === 0) return null;
+
+  // champs consommation possibles (à adapter si tu découvres mieux)
+  // d’après l’API: conso_5_usages_ep (kWhEP/an) et conso_5_usages_par_m2_ep (kWhEP/m²/an)
+
+  const CONSO_KEYS = ["conso_5_usages_par_m2_ep"];
+
+
+console.log("computeBuildingConso() sample keys:", dpeList?.[0] && Object.keys(dpeList[0]));
+console.log("computeBuildingConso() sample:", dpeList?.[0]);
+
+const items = dpeList.map(d => {
+  const typeTxt = String(
+    d?.type_dpe || d?.type_diagnostic || d?.type_batiment || d?.type_usage || ""
+  ).toLowerCase();
+
+  const isCollectif =
+    !!d?.numero_dpe_immeuble_associe ||
+    typeTxt.includes("collectif") ||
+    typeTxt.includes("immeuble");
+
+  return {
+    d,
+    t: parseDateSafe(d?.date_etablissement_dpe),
+    isCollectif,
+    conso: pickFirstNumber(d, CONSO_KEYS)
+  };
+});
+
+
+  // 1) Collectif -> le plus récent (avec conso valide)
+  const collectifs = items
+    .filter(x => x.isCollectif && isFinite(x.conso))
+    .sort((a,b) => b.t - a.t);
+
+  if (collectifs.length > 0) {
+    return collectifs[0].conso;
+  }
+
+  // 2) Individuels -> moyenne des N plus récents (avec conso valide)
+  const indivs = items
+    .filter(x => !x.isCollectif && isFinite(x.conso))
+    .sort((a,b) => b.t - a.t)
+    .slice(0, nRecentIndiv);
+
+  if (indivs.length === 0) return null;
+
+  const avg = indivs.reduce((s,x) => s + x.conso, 0) / indivs.length;
+  return avg;
+}
+
 function initMap() {
   // 1) Fonds
   baseOSM = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -1504,6 +1819,8 @@ function initMap() {
     type: "satellite",
     maxZoom: 21
   });
+
+
 
   // 2) Carte
   const boundsIDF = [
@@ -1521,11 +1838,93 @@ function initMap() {
   map.setMinZoom(9);
   map.options.maxBoundsViscosity = 1.0;
   map.fitBounds(boundsIDF);
+    map.on("moveend", scheduleBuildingsReload);
+  map.on("zoomend", scheduleBuildingsReload);
+  scheduleBuildingsReload();
+
 
   // 3) Layer group principal (IMPORTANT)
   markerLayer = L.layerGroup().addTo(map);
 
+buildingsLayer = L.geoJSON(null, {
+  style: (feature) => {
+    const conso = feature?.properties?._dpeConso ?? null;
+    return {
+      color: "#0f172a",
+      weight: 1,
+      opacity: 0.9,
+      fillColor: consoToColor(conso),
+      fillOpacity: 0.45
+    };
+  },
+
+  onEachFeature: (feature, layer) => {
+    layer.on("click", async (e) => {
+      L.DomEvent.stopPropagation(e);
+
+      const center = layer.getBounds().getCenter();
+      const lat = center.lat;
+      const lon = center.lng;
+
+      const nearest = findNearestCoproPoint(lat, lon, 60);
+      const coproPoint = nearest?.point || null;
+
+      if (!coproPoint) {
+        openSidebar("Bâtiment (OSM)", `...`);
+        return;
+      }
+
+// 1) récup DPE autour de la copro (point registre le + proche)
+const dpeFull = await fetchDPEForCoordinates(coproPoint.lat, coproPoint.lon);
+console.log("DPE sample keys:", dpeFull?.[0] && Object.keys(dpeFull[0]));
+console.log("DPE sample:", dpeFull?.[0]);
+
+// 2) calcule conso bâtiment (dernier collectif sinon moyenne des 5 derniers indiv)
+const conso = computeBuildingConso(dpeFull, 5);
+feature.properties._dpeConso = conso;
+console.log("DEBUG first DPE:", dpeFull?.[0]);
+console.log("DEBUG conso:", conso, "type:", typeof conso);
+
+
+console.log("DEBUG conso:", {
+  conso,
+  type: typeof conso,
+  dpeCount: dpeFull?.length,
+  raw0_par_m2: dpeFull?.[0]?.conso_5_usages_par_m2_ep,
+  raw0_ep: dpeFull?.[0]?.conso_5_usages_ep,
+  isCollectif0: !!dpeFull?.[0]?.numero_dpe_immeuble_associe,
+  date0: dpeFull?.[0]?.date_etablissement_dpe
+});
+
+layer.setStyle({
+  fillColor: consoToColor(conso, 70, 300),
+  fillOpacity: 0.45,
+  color: "#0f172a",
+  weight: 1,
+  opacity: 0.8
+});
+
+
+
+console.log("DPE building:", dpeFull?.length, "conso:", conso);
+appendDPEToSidebar(dpeFull);
+
+
+      // 4) sidebar (comme avant)
+      const { title, html } = buildSidebarHtmlForPoint(coproPoint);
+      openSidebar(title, html);
+      window.selectedCoproForMonday = coproPoint;
+
+      // (optionnel) DPE details
+      appendDPEToSidebar(dpeFull);
+    });
+  }
+}).addTo(map);
+
+
+
   // 4) Control layers (Fond + DPE)
+ 
   const baseLayers = {
     "Fond OSM": baseOSM,
     "Satellite Google": googleSat
@@ -1541,13 +1940,28 @@ function initMap() {
     "Classe D": dpeClassLayers["D"],
     "Classe E": dpeClassLayers["E"],
     "Classe F": dpeClassLayers["F"],
-    "Classe G": dpeClassLayers["G"]
-  };
+     "Classe G": dpeClassLayers["G"]
+};
 
-  L.control.layers(baseLayers, dpeOverlays, {
-    position: "topright",
-    collapsed: false
-  }).addTo(map);
+L.control.layers(baseLayers, dpeOverlays, {
+  position: "topright",
+  collapsed: false
+}).addTo(map);
+
+
+
+// Overlays (couches)
+const overlays = {
+  "Copro (points)": markerLayer,
+  "Bâtiments (OSM)": buildingsLayer,
+  // ↓ ajoute ici tes DPE overlays si tu en as
+  // "DPE collectif": dpeCollectifLayer,
+  // "DPE individuel": dpeIndividuelLayer,
+  // "DPE aucun": dpeNoneLayer,
+  // "DPE A": dpeClassLayers["A"],
+  // ...
+};
+
 
   // 5) Ajoute les calques DPE sur la carte (sinon ils restent vides/inactifs)
   dpeCollectifLayer.addTo(map);
@@ -1593,7 +2007,7 @@ function initMap() {
 
   // 7) Clic sur la carte = fermer sidebar
   map.on("click", () => closeSidebar());
-}
+
 
 
 function setBaseLayer(mode) {
@@ -1615,6 +2029,7 @@ function setBaseLayer(mode) {
     }
   }
 }
+} 
 
 /* -----------------------------------------------------
    CHARGEMENT CSV – MULTI FICHIERS
@@ -1665,6 +2080,8 @@ async function loadAllCoproData() {
       statusEl.innerText += `\n⚠️ Erreur sur ${file} (voir console).`;
     }
   }
+
+  pointList = Array.from(pointIndex.values());
 
   statusEl.innerText +=
     `\n\nTotal lignes COPRO : ${totalRows}` +
