@@ -892,11 +892,175 @@
   .kv-grid{ grid-template-columns: 1fr; }
 }
 
+/* ==========================
+   PAGE DE GARDE (overlay premium)
+========================== */
+.cover {
+  position: fixed;
+  inset: 0;
+  z-index: 30000;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(1200px 700px at 20% 10%, rgba(34,197,94,0.20), transparent 60%),
+              radial-gradient(900px 600px at 80% 20%, rgba(96,165,250,0.18), transparent 60%),
+              rgba(2,6,23,0.65);
+  backdrop-filter: blur(14px);
+  padding: 22px;
+}
+
+.cover.hidden { display: none; }
+
+.cover-card {
+  width: min(980px, 94vw);
+  border-radius: 24px;
+  background: rgba(17,24,39,0.88);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 24px 90px rgba(0,0,0,0.55);
+  overflow: hidden;
+  color: #fff;
+}
+
+.cover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  background: rgba(17,24,39,0.65);
+}
+
+.cover-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cover-brand img {
+  height: 30px;
+  width: auto;
+  border-radius: 10px;
+  background: rgba(34,197,94,0.10);
+  border: 1px solid rgba(34,197,94,0.18);
+  padding: 6px;
+}
+
+.cover-title {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.cover-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.70);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cover-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 18px 0;
+}
+
+.cover-tab {
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.92);
+  border-radius: 999px;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.cover-tab.active {
+  border-color: rgba(34,197,94,0.40);
+  background: linear-gradient(180deg, rgba(34,197,94,0.92), rgba(5,150,105,0.92));
+  color: #053a2b;
+}
+
+.cover-body {
+  padding: 14px 18px 18px;
+}
+
+.cover-panel {
+  display: none;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(2,6,23,0.35);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.cover-panel.active { display: block; }
+
+.cover-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.cover-input {
+  flex: 1;
+  min-width: 260px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  border-radius: 14px;
+  padding: 12px 12px;
+  outline: none;
+}
+
+.cover-input::placeholder { color: rgba(255,255,255,0.55); }
+
+.cover-btn {
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.92);
+  border-radius: 999px;
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.cover-btn.primary {
+  border: 1px solid rgba(34,197,94,0.35);
+  background: linear-gradient(180deg, rgba(34,197,94,0.95), rgba(5,150,105,0.95));
+  color: #053a2b;
+}
+
+.cover-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.70);
+  line-height: 1.4;
+}
+
+.cover-close {
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.92);
+  border-radius: 999px;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
   </style>
 
   <!-- Librairies -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/kdbush@4.0.2/kdbush.min.js"></script>
+<script src="https://unpkg.com/geokdbush@2.0.1/geokdbush.min.js"></script>
+
 
   <!-- Google Maps JS API -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4izaTwbsKKyjVuOJ2Bu0ZHfZRg7mv-ZA&libraries=places"></script>
@@ -912,6 +1076,67 @@
 <div class="brand-fixed">
   <img src="assets/LOGO CITEEN_RVB-min.png" alt="Citeen">
 </div>
+
+<!-- PAGE DE GARDE (au démarrage) -->
+<div class="cover" id="cover">
+  <div class="cover-card">
+    <div class="cover-head">
+      <div class="cover-brand">
+        <img src="assets/LOGO CITEEN_RVB-min.png" alt="Citeen" />
+        <div style="min-width:0;">
+          <div class="cover-title">Citeen</div>
+          <div class="cover-sub">Choisissez un mode de travail</div>
+        </div>
+      </div>
+
+      <button class="cover-close" id="coverCloseBtn" type="button">Accéder à la carte</button>
+    </div>
+
+    <div class="cover-tabs">
+      <button class="cover-tab active" id="tabRegistre" type="button">Registre copro</button>
+      <button class="cover-tab" id="tabDpeAdresse" type="button">DPE par adresse</button>
+      <button class="cover-tab" id="tabVille" type="button">Travailler sur une ville</button>
+    </div>
+
+    <div class="cover-body">
+
+      <!-- PANEL 1 : Registre -->
+      <div class="cover-panel active" id="panelRegistre">
+        <div style="font-weight:900; font-size:13px;">Recherche dans le registre des copropriétés</div>
+        <div class="cover-hint">Vous allez utiliser votre moteur actuel (nom de copro, adresse, voie, commune, syndic, CP, période…).</div>
+
+        <div class="cover-row">
+          <button class="cover-btn primary" id="startRegistreBtn" type="button">Ouvrir le registre</button>
+        </div>
+      </div>
+
+      <!-- PANEL 2 : DPE par adresse -->
+      <div class="cover-panel" id="panelDpeAdresse">
+        <div style="font-weight:900; font-size:13px;">Rechercher un DPE à partir d’une adresse</div>
+        <div class="cover-hint">Saisie assistée Google. On récupère les coordonnées puis on interroge l’API ADEME autour du point.</div>
+
+        <div class="cover-row">
+          <input class="cover-input" id="dpeAddressInput" type="text" placeholder="Saisir une adresse (Google)..." />
+          <button class="cover-btn primary" id="dpeAddressGoBtn" type="button">Chercher DPE</button>
+        </div>
+      </div>
+
+      <!-- PANEL 3 : Ville -->
+      <div class="cover-panel" id="panelVille">
+        <div style="font-weight:900; font-size:13px;">Travailler directement sur une ville</div>
+        <div class="cover-hint">Saisie assistée Google (villes). On zoome sur la ville et vous pouvez lancer une recherche registre centrée sur cette ville.</div>
+
+        <div class="cover-row">
+          <input class="cover-input" id="cityInput" type="text" placeholder="Saisir une ville (Google)..." />
+          <button class="cover-btn" id="cityZoomBtn" type="button">Zoom sur la ville</button>
+          <button class="cover-btn primary" id="cityStartRegistreBtn" type="button">Ouvrir registre sur la ville</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 
 <!-- PANNEAU DE RECHERCHE -->
 <!-- PANNEAU DE RECHERCHE (Premium) -->
@@ -1034,6 +1259,20 @@ let lastFilteredCoproRows = [];
 const dpeCache = new Map(); // key "lat|lon" -> dpe object
 let pointList = []; // tableau des points pour recherche "nearest"
 
+let spatialIndex = null;
+
+/* Prefetch DPE (limite la pression API) */
+const DPE_PREFETCH_ENABLED = true;
+const DPE_PREFETCH_CONCURRENCY = 6;
+const dpePrefetchQueue = [];
+let dpePrefetchRunning = 0;
+
+/* Empêche la duplication DPE si append est appelé plusieurs fois */
+let sidebarDpeInjectedOnce = false;
+
+/* Canvas renderer Leaflet (perf points) */
+const canvasRenderer = L.canvas({ padding: 0.5 });
+
 
 
 /* Carte / couches */
@@ -1114,7 +1353,8 @@ async function loadBuildingsFromOverpass() {
   if (overpassCache.has(key)) {
     buildingsLayer.clearLayers();
     buildingsLayer.addData(overpassCache.get(key));
-    recolorVisibleBuildings();
+    recolorVisibleBuildingsV2();
+    buildingsLayer.addData(geojson);
     return;
   }
 
@@ -1127,7 +1367,6 @@ async function loadBuildingsFromOverpass() {
 [out:json][timeout:25];
 (
   way["building"](${s},${w},${n},${e});
-  relation["building"](${s},${w},${n},${e});
 );
 out body geom;
   `.trim();
@@ -1183,7 +1422,7 @@ async function recolorVisibleBuildings() {
       if (Number.isFinite(feature.properties?._dpeConso)) continue;
 
       const center = layer.getBounds().getCenter();
-      const nearest = findNearestCoproPoint(center.lat, center.lng, 60);
+      const nearest = findNearestCoproPointFast(center.lat, center.lng, 60);
       const coproPoint = nearest?.point;
       if (!coproPoint) continue;
 
@@ -1227,7 +1466,7 @@ async function recolorVisibleBuildings() {
     if (Number.isFinite(feature.properties?._dpeConso)) continue;
 
     const center = layer.getBounds().getCenter();
-    const nearest = findNearestCoproPoint(center.lat, center.lng, 60);
+    const nearest = findNearestCoproPointFast(center.lat, center.lng, 60);
     const coproPoint = nearest?.point;
     if (!coproPoint) continue;
 
@@ -1294,6 +1533,39 @@ function findNearestCoproPoint(lat, lon, maxMeters = 60){
   if (best && bestD <= maxMeters) return { point: best, distance: bestD };
   return null;
 }
+function buildSpatialIndex() {
+  try {
+    if (!Array.isArray(pointList) || pointList.length === 0) {
+      spatialIndex = null;
+      return;
+    }
+    spatialIndex = new KDBush(
+      pointList,
+      p => p.lon,
+      p => p.lat,
+      64,
+      Float64Array
+    );
+  } catch (e) {
+    console.warn("Spatial index build failed:", e);
+    spatialIndex = null;
+  }
+}
+
+function findNearestCoproPointFast(lat, lon, maxMeters = 60) {
+  // fallback sur ta version actuelle si l’index n’est pas prêt
+  if (!spatialIndex || !pointList || pointList.length === 0) {
+    return findNearestCoproPoint(lat, lon, maxMeters);
+  }
+
+  const res = geokdbush.around(spatialIndex, lon, lat, 1, maxMeters / 1000);
+  if (!res || res.length === 0) return null;
+
+  const p = res[0];
+  const d = haversineMeters(lat, lon, p.lat, p.lon);
+  return d <= maxMeters ? { point: p, distance: d } : null;
+}
+
 
 /* -----------------------------------------------------
    GEO – LAT/LON POUR COPRO
@@ -1353,6 +1625,7 @@ function openSidebar(title, htmlContent) {
   if (!infoSidebarEl || !infoSidebarContentEl || !infoSidebarTitleEl) return;
   infoSidebarTitleEl.textContent = title || "Immeuble";
   infoSidebarContentEl.innerHTML = htmlContent;
+  sidebarDpeInjectedOnce = false;
   infoSidebarEl.classList.add("visible");
 }
 
@@ -1568,9 +1841,36 @@ async function fetchDPEForCoordinates(lat, lon) {
   }
 }
 
+function enqueueDPEPrefetch(lat, lon) {
+  if (!DPE_PREFETCH_ENABLED) return;
+
+  const key = lat.toFixed(6) + "|" + lon.toFixed(6);
+  if (dpeCache.has(key)) return;
+
+  dpePrefetchQueue.push({ lat, lon, key });
+  drainDPEPrefetchQueue();
+}
+
+function drainDPEPrefetchQueue() {
+  while (dpePrefetchRunning < DPE_PREFETCH_CONCURRENCY && dpePrefetchQueue.length) {
+    const job = dpePrefetchQueue.shift();
+    dpePrefetchRunning++;
+
+    fetchDPEForCoordinates(job.lat, job.lon)
+      .catch(() => {})
+      .finally(() => {
+        dpePrefetchRunning--;
+        drainDPEPrefetchQueue();
+      });
+  }
+}
+
 
 function appendDPEToSidebar(dpeList) {
   if (!infoSidebarContentEl) return;
+  if (sidebarDpeInjectedOnce) return;
+sidebarDpeInjectedOnce = true;
+
 
   const has = Array.isArray(dpeList) && dpeList.length > 0;
 
@@ -1807,6 +2107,50 @@ const items = dpeList.map(d => {
   const avg = indivs.reduce((s,x) => s + x.conso, 0) / indivs.length;
   return avg;
 }
+let recolorJobIdV2 = 0;
+
+async function recolorVisibleBuildingsV2() {
+  if (!buildingsLayer) return;
+
+  const jobId = ++recolorJobIdV2;
+
+  const layers = [];
+  buildingsLayer.eachLayer(l => layers.push(l));
+
+  const MAX = Math.min(layers.length, 250);
+  const queue = layers.slice(0, MAX);
+  const CONCURRENCY = 4;
+
+  async function worker() {
+    while (queue.length) {
+      if (jobId !== recolorJobIdV2) return;
+
+      const layer = queue.pop();
+      const feature = layer?.feature;
+      if (!feature) continue;
+      if (Number.isFinite(feature.properties?._dpeConso)) continue;
+
+      const center = layer.getBounds().getCenter();
+      const nearest = findNearestCoproPointFast(center.lat, center.lng, 60);
+      const coproPoint = nearest?.point;
+      if (!coproPoint) continue;
+
+      const dpeFull = await fetchDPEForCoordinates(coproPoint.lat, coproPoint.lon);
+      const conso = computeBuildingConso(dpeFull, 5);
+      feature.properties._dpeConso = conso;
+
+      layer.setStyle({
+        fillColor: consoToColor(conso, 70, 300),
+        fillOpacity: 0.45,
+        color: "#0f172a",
+        weight: 1,
+        opacity: 0.8
+      });
+    }
+  }
+
+  await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+}
 
 function initMap() {
   // 1) Fonds
@@ -1866,7 +2210,7 @@ buildingsLayer = L.geoJSON(null, {
       const lat = center.lat;
       const lon = center.lng;
 
-      const nearest = findNearestCoproPoint(lat, lon, 60);
+      const nearest = findNearestCoproPointFast(lat, lon, 60);
       const coproPoint = nearest?.point || null;
 
       if (!coproPoint) {
@@ -1907,7 +2251,6 @@ layer.setStyle({
 
 
 console.log("DPE building:", dpeFull?.length, "conso:", conso);
-appendDPEToSidebar(dpeFull);
 
 
       // 4) sidebar (comme avant)
@@ -2082,6 +2425,8 @@ async function loadAllCoproData() {
   }
 
   pointList = Array.from(pointIndex.values());
+  buildSpatialIndex();
+
 
   statusEl.innerText +=
     `\n\nTotal lignes COPRO : ${totalRows}` +
@@ -2134,6 +2479,7 @@ if (cachedDPE && cachedDPE.length > 0) {
        2) Création du marker
     -------------------------------------------------- */
     const marker = L.circleMarker([lat, lon], {
+      renderer: canvasRenderer,
       radius: 5,
       color: markerColor,
       fillColor: markerColor,
@@ -2164,6 +2510,8 @@ if (cachedDPE && cachedDPE.length > 0) {
     /* --------------------------------------------------
        3) Mise à jour couleur après récupération du DPE
     -------------------------------------------------- */
+    enqueueDPEPrefetch(lat, lon);
+
     fetchDPEForCoordinates(lat, lon)
   .then((dpeList) => {
     if (!dpeList || dpeList.length === 0) {
@@ -2530,8 +2878,264 @@ function minimizeSearchPanel() {
 /* -----------------------------------------------------
    DOM READY
 ------------------------------------------------------ */
+function coverShow() {
+  const el = document.getElementById("cover");
+  if (el) el.classList.remove("hidden");
+}
+
+function coverHide() {
+  const el = document.getElementById("cover");
+  if (el) el.classList.add("hidden");
+}
+
+function setActiveTab(tabName) {
+  const tabReg = document.getElementById("tabRegistre");
+  const tabDpe = document.getElementById("tabDpeAdresse");
+  const tabVil = document.getElementById("tabVille");
+
+  const pReg = document.getElementById("panelRegistre");
+  const pDpe = document.getElementById("panelDpeAdresse");
+  const pVil = document.getElementById("panelVille");
+
+  const active = (btn, on) => btn && btn.classList.toggle("active", on);
+  const panel = (el, on) => el && el.classList.toggle("active", on);
+
+  active(tabReg, tabName === "registre");
+  active(tabDpe, tabName === "dpe");
+  active(tabVil, tabName === "ville");
+
+  panel(pReg, tabName === "registre");
+  panel(pDpe, tabName === "dpe");
+  panel(pVil, tabName === "ville");
+}
+
+// Marker temporaire pour la recherche DPE adresse
+let coverTempMarker = null;
+
+function setTempMarker(lat, lon) {
+  if (!map) return;
+  if (coverTempMarker) {
+    try { map.removeLayer(coverTempMarker); } catch(e) {}
+    coverTempMarker = null;
+  }
+  coverTempMarker = L.circleMarker([lat, lon], {
+    radius: 8,
+    color: "#22c55e",
+    fillColor: "#22c55e",
+    fillOpacity: 0.35,
+    weight: 2
+  }).addTo(map);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initMap();
+    // ==========================
+  // PAGE DE GARDE : UI + modes
+  // ==========================
+  const cover = document.getElementById("cover");
+  const coverCloseBtn = document.getElementById("coverCloseBtn");
+
+  const tabRegistre = document.getElementById("tabRegistre");
+  const tabDpeAdresse = document.getElementById("tabDpeAdresse");
+  const tabVille = document.getElementById("tabVille");
+
+  const startRegistreBtn = document.getElementById("startRegistreBtn");
+
+  const dpeAddressInput = document.getElementById("dpeAddressInput");
+  const dpeAddressGoBtn = document.getElementById("dpeAddressGoBtn");
+
+  const cityInput = document.getElementById("cityInput");
+  const cityZoomBtn = document.getElementById("cityZoomBtn");
+  const cityStartRegistreBtn = document.getElementById("cityStartRegistreBtn");
+
+  // Au démarrage : on montre la cover
+  if (cover) coverShow();
+    const searchShellEl = document.getElementById("searchShell");
+  if (searchShellEl) searchShellEl.style.visibility = "hidden";
+
+  function onCoverHide() {
+    if (searchShellEl) searchShellEl.style.visibility = "visible";
+  }
+
+  if (coverCloseBtn) coverCloseBtn.addEventListener("click", onCoverHide);
+  if (startRegistreBtn) startRegistreBtn.addEventListener("click", onCoverHide);
+  if (dpeAddressGoBtn) dpeAddressGoBtn.addEventListener("click", onCoverHide);
+  if (cityZoomBtn) cityZoomBtn.addEventListener("click", onCoverHide);
+  if (cityStartRegistreBtn) cityStartRegistreBtn.addEventListener("click", onCoverHide);
+
+
+  if (coverCloseBtn) coverCloseBtn.addEventListener("click", coverHide);
+
+  if (tabRegistre) tabRegistre.addEventListener("click", () => setActiveTab("registre"));
+  if (tabDpeAdresse) tabDpeAdresse.addEventListener("click", () => setActiveTab("dpe"));
+  if (tabVille) tabVille.addEventListener("click", () => setActiveTab("ville"));
+
+  // Mode 1 : registre (ton moteur existant)
+  if (startRegistreBtn) {
+    startRegistreBtn.addEventListener("click", () => {
+      coverHide();
+      // Optionnel: focus sur la recherche existante
+      const searchInput = document.getElementById("searchInput");
+      if (searchInput) searchInput.focus();
+    });
+  }
+
+  // ==========================
+  // Google Places Autocomplete
+  // ==========================
+  let dpeAutocomplete = null;
+  let cityAutocomplete = null;
+
+  // DPE par adresse : adresse complète
+  if (window.google && google.maps && google.maps.places && dpeAddressInput) {
+    dpeAutocomplete = new google.maps.places.Autocomplete(dpeAddressInput, {
+      fields: ["geometry", "formatted_address", "name"],
+      // componentRestrictions: { country: ["fr"] } // si tu veux forcer FR
+    });
+  }
+
+  // Ville : types "(cities)"
+  if (window.google && google.maps && google.maps.places && cityInput) {
+    cityAutocomplete = new google.maps.places.Autocomplete(cityInput, {
+      types: ["(cities)"],
+      fields: ["geometry", "name", "formatted_address"]
+      // componentRestrictions: { country: ["fr"] }
+    });
+  }
+
+  async function runDpeAddressSearchFromPlace(place) {
+    if (!place || !place.geometry || !place.geometry.location) {
+      alert("Adresse invalide. Choisissez une suggestion Google.");
+      return;
+    }
+    const lat = place.geometry.location.lat();
+    const lon = place.geometry.location.lng();
+
+    coverHide();
+
+    // zoom + marker
+    map.setView([lat, lon], 17);
+    setTempMarker(lat, lon);
+
+    // Sidebar
+    openSidebar(
+      place.formatted_address || place.name || "Adresse",
+      `<div class="premium-wrap">
+        <div class="premium-card">
+          <div class="premium-card-head">
+            <div class="premium-card-title">📍 Adresse</div>
+            <div class="premium-chip">Recherche DPE</div>
+          </div>
+          <div class="kv-grid">
+            <div class="kv full">
+              <div class="k">Adresse</div>
+              <div class="v">${esc(place.formatted_address || place.name || "")}</div>
+            </div>
+            <div class="kv">
+              <div class="k">Latitude</div>
+              <div class="v">${Number(lat).toFixed(6)}</div>
+            </div>
+            <div class="kv">
+              <div class="k">Longitude</div>
+              <div class="v">${Number(lon).toFixed(6)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="premium-card" id="dpeCard">
+          <div class="premium-card-head">
+            <div class="premium-card-title">🔋 DPE</div>
+            <div class="premium-chip">Chargement…</div>
+          </div>
+          <div class="kv-grid">
+            <div class="kv full">
+              <div class="k">Statut</div>
+              <div class="v">Interrogation ADEME autour du point…</div>
+            </div>
+          </div>
+        </div>
+      </div>`
+    );
+
+    const dpeList = await fetchDPEForCoordinates(lat, lon);
+    appendDPEToSidebar(dpeList);
+  }
+
+  if (dpeAddressGoBtn) {
+    dpeAddressGoBtn.addEventListener("click", async () => {
+      if (!dpeAutocomplete) {
+        alert("Google Places n’est pas prêt. Vérifie le chargement de l’API Google.");
+        return;
+      }
+      const place = dpeAutocomplete.getPlace();
+      await runDpeAddressSearchFromPlace(place);
+    });
+  }
+
+  if (dpeAutocomplete) {
+    dpeAutocomplete.addListener("place_changed", async () => {
+      // Option : lancer direct
+      // const place = dpeAutocomplete.getPlace();
+      // await runDpeAddressSearchFromPlace(place);
+    });
+  }
+
+  // Ville : zoom ou ouvrir registre
+  function getCityPlace() {
+    if (!cityAutocomplete) return null;
+    return cityAutocomplete.getPlace();
+  }
+
+  if (cityZoomBtn) {
+    cityZoomBtn.addEventListener("click", () => {
+      const place = getCityPlace();
+      if (!place || !place.geometry) {
+        alert("Ville invalide. Choisissez une suggestion Google.");
+        return;
+      }
+      coverHide();
+      if (place.geometry.viewport) {
+        const ne = place.geometry.viewport.getNorthEast();
+        const sw = place.geometry.viewport.getSouthWest();
+        map.fitBounds([[sw.lat(), sw.lng()], [ne.lat(), ne.lng()]], { padding: [20, 20] });
+      } else if (place.geometry.location) {
+        map.setView([place.geometry.location.lat(), place.geometry.location.lng()], 12);
+      }
+    });
+  }
+
+  if (cityStartRegistreBtn) {
+    cityStartRegistreBtn.addEventListener("click", () => {
+      const place = getCityPlace();
+      if (!place || !place.geometry) {
+        alert("Ville invalide. Choisissez une suggestion Google.");
+        return;
+      }
+
+      coverHide();
+
+      // Zoom sur la ville
+      if (place.geometry.viewport) {
+        const ne = place.geometry.viewport.getNorthEast();
+        const sw = place.geometry.viewport.getSouthWest();
+        map.fitBounds([[sw.lat(), sw.lng()], [ne.lat(), ne.lng()]], { padding: [20, 20] });
+      } else if (place.geometry.location) {
+        map.setView([place.geometry.location.lat(), place.geometry.location.lng()], 12);
+      }
+
+      // Remplit ton champ de recherche principal avec le nom de ville et lance une recherche
+      const mainSearchInput = document.getElementById("searchInput");
+      if (mainSearchInput) {
+        mainSearchInput.value = place.name || "";
+      }
+
+      // Lance le filtre (ton moteur existant)
+      hasSearched = true;
+      applyFilters();
+      minimizeSearchPanel();
+    });
+  }
+
 
   infoSidebarEl = document.getElementById("infoSidebar");
   infoSidebarContentEl = document.getElementById("infoSidebarContent");
