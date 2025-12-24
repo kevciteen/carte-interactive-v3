@@ -1053,6 +1053,11 @@
   cursor: pointer;
 }
 
+/* Google Places Autocomplete dropdown toujours au-dessus */
+.pac-container {
+  z-index: 999999 !important;
+}
+
   </style>
 
   <!-- Librairies -->
@@ -1260,6 +1265,7 @@ const dpeCache = new Map(); // key "lat|lon" -> dpe object
 let pointList = []; // tableau des points pour recherche "nearest"
 
 let spatialIndex = null;
+let dpeSelectedPlace = null;
 
 /* Prefetch DPE (limite la pression API) */
 const DPE_PREFETCH_ENABLED = true;
@@ -1809,6 +1815,22 @@ function buildSidebarHtmlForPoint(p) {
 /* -----------------------------------------------------
    CARTE LEAFLET + FONDS
 ------------------------------------------------------ */
+
+function geocodeAddressToLatLng(address) {
+  return new Promise((resolve, reject) => {
+    if (!window.google || !google.maps) return reject(new Error("Google non prêt"));
+
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status !== "OK" || !results || !results[0]) {
+        reject(new Error("Geocoding impossible: " + status));
+        return;
+      }
+      const loc = results[0].geometry.location;
+      resolve({ lat: loc.lat(), lon: loc.lng(), formatted: results[0].formatted_address });
+    });
+  });
+}
 
 async function fetchDPEForCoordinates(lat, lon) {
   const key = lat.toFixed(6) + "|" + lon.toFixed(6);
@@ -2925,6 +2947,31 @@ function setTempMarker(lat, lon) {
     fillOpacity: 0.35,
     weight: 2
   }).addTo(map);
+}
+
+
+function initDpeAddressAutocomplete() {
+  const input = document.getElementById("dpeAddressInput");
+  if (!input) return;
+
+  if (!(window.google && google.maps && google.maps.places)) {
+    console.warn("Google Places non dispo");
+    return;
+  }
+
+  const ac = new google.maps.places.Autocomplete(input, {
+    types: ["geocode"],
+    componentRestrictions: { country: "fr" },
+    fields: ["geometry", "formatted_address", "address_components"]
+  });
+
+  ac.addListener("place_changed", () => {
+    dpeSelectedPlace = ac.getPlace();
+  });
+
+  input.addEventListener("input", () => {
+    dpeSelectedPlace = null;
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
